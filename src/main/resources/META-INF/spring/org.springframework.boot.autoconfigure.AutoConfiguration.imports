@@ -1,0 +1,3 @@
+ua.com.allymailer.wrapper.AllyMailerAutoConfiguration
+ua.com.allymailer.wrapper.AllyMailerMailAutoConfiguration
+ua.com.allymailer.wrapper.AllyMailerWebhookAutoConfiguration
