@@ -1,0 +1,50 @@
+# Generated: publishes the package when a tag v* is pushed. Do not edit, the next release replaces it.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v4
+      - name: The tag is the version of the package
+        run: test "$GITHUB_REF_NAME" = "v2.1.1" || { echo "tag $GITHUB_REF_NAME, package v2.1.1"; exit 1; }
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Import the GPG key
+        run: echo "$MAVEN_GPG_PRIVATE_KEY" | gpg --batch --import
+        env:
+          MAVEN_GPG_PRIVATE_KEY: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+      - name: Build and sign the bundle
+        run: |
+          mvn -B clean package source:jar javadoc:jar -Ddoclint=none
+          D=target/bundle/ua/com/allymailer/allymailer-spring-boot-starter/2.1.1 && mkdir -p $D
+          cp target/allymailer-spring-boot-starter-2.1.1.jar target/allymailer-spring-boot-starter-2.1.1-sources.jar target/allymailer-spring-boot-starter-2.1.1-javadoc.jar $D/
+          cp pom.xml $D/allymailer-spring-boot-starter-2.1.1.pom
+          cd $D
+          for f in *.jar *.pom; do
+            gpg --batch --pinentry-mode loopback --passphrase "$MAVEN_GPG_PASSPHRASE" -ab "$f"
+            md5sum "$f" | cut -d' ' -f1 > "$f.md5"
+            sha1sum "$f" | cut -d' ' -f1 > "$f.sha1"
+          done
+          cd "$GITHUB_WORKSPACE/target/bundle" && zip -qr ../central-bundle.zip .
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+      - name: Upload to Maven Central
+        run: |
+          TOKEN=$(printf '%s:%s' "$CENTRAL_USER" "$CENTRAL_PASSWORD" | base64 -w0)
+          curl --fail-with-body -H "Authorization: Bearer $TOKEN" -F bundle=@target/central-bundle.zip \
+            "https://central.sonatype.com/api/v1/publisher/upload?publishingType=AUTOMATIC&name=allymailer-spring-boot-starter-2.1.1"
+        env:
+          CENTRAL_USER: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}

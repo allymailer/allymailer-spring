@@ -45,7 +45,7 @@ public class AllyMailerAutoConfiguration {
         if (apiKey == null) {
             throw new IllegalStateException("AllyMailer: set the API key (allymailer.api-key or ALLYMAILER_API_KEY)");
         }
-        Configuration config = new Configuration(apiKey).setPlatform("spring.2.0.0");
+        Configuration config = new Configuration(apiKey).setPlatform("spring.2.1.1");
         String host = setting(properties.getHost(), environment, "ALLYMAILER_HOST");
         if (host != null) {
             config.setBaseUrl(Configuration.baseUrlFor(host));

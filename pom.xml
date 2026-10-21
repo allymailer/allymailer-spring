@@ -6,7 +6,7 @@
 
     <groupId>ua.com.allymailer</groupId>
     <artifactId>allymailer-spring-boot-starter</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.1</version>
     <packaging>jar</packaging>
 
     <name>AllyMailer Spring Boot Starter</name>
@@ -20,8 +20,17 @@
         </license>
     </licenses>
 
+    <developers>
+        <developer>
+            <name>AllyMailer</name>
+            <url>https://allymailer.com.ua</url>
+        </developer>
+    </developers>
+
     <scm>
         <url>https://github.com/allymailer/allymailer-spring</url>
+        <connection>scm:git:https://github.com/allymailer/allymailer-spring.git</connection>
+        <developerConnection>scm:git:git@github.com:allymailer/allymailer-spring.git</developerConnection>
     </scm>
 
     <properties>
@@ -46,7 +55,7 @@
         <dependency>
             <groupId>ua.com.allymailer</groupId>
             <artifactId>java-sdk</artifactId>
-            <version>2.0.0</version>
+            <version>2.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
